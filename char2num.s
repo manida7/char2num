@@ -1,3 +1,4 @@
+
 .section .bss
 .comm arr, 1
 .section .rodata
@@ -23,72 +24,45 @@ err0:
 
 .globl _start
 _start:
-# read one byte
+ # read one byte
   mov $0, %rax   # number of read syscall
   mov $0, %rdi   # where to read from (stdin)
   mov $arr, %rsi # string address to write to
   mov $1, %rdx   # how many bytes to read
   syscall
 
- # first part of your task is:
- # now write a code which checks
- # if what was read from stdin
- # is in the range of 48-57 - i. e. it is a ascii character
- # which represents number
- # otherwise it prints an error
- # for example if you do
- # echo "+" | ./char2num
- # it should print
- # "not a number, pass digit character to stdin\n"
- # look i already defined a string in the beginning of the file.
- # and if you do
- # echo "a" | ./char2num
- # that also should result in the same error.
- # otherwise, in case you read the character which is a number
- # print to the console: "got number!". again, the string is there for you
+ # Load the character from memory
+    xor %rbx, %rbx
+    movb (%rsi), %bl
+    # Check if the character is a digit (ASCII 48-57)
+    #cmp $48, %rbx          # Compare with '0'
+    #jl err0           # If less, it's not a digit
+    #cmp $57, %rbx          # Compare with '9'
+    #jg err0           # If greater, it's not a digit
 
- # so here should be your code for
- # if ch is in range 48..57 then
- #   writeln "not a number, pass digit character to stdin"
- # else
- #   writeln "got number!"
- # end if
- #
- # go on
+    # If it's a digit, print "got number!"
+    #mov $1, %rbx           # syscall: write
+    #mov $1, %rdi           # file descriptor: stdout
+    #mov $number, %rsi      # address of "got number!\n"
+    #mov $13, %rdx          # length of message
+    #syscall
 
 
- # now, lets try to output what was read from stdin
 
-   mov $1, %rax                # system call for write
-   mov  $1, %rdi                # file handle for stdout
-   mov  $arr, %rsi                # address of string to output
-   mov  $1, %rdx                # number of bytes
-   syscall
+   sub $48, %rbx          # Convert character to number
 
-# write eol
-   mov $1, %rax                # system call for write
-   mov  $1, %rdi                # file handle for stdout
-   mov  $eol, %rsi                # address of string to output
-   mov  $1, %rdx                # number of bytes
-   syscall
 
- # now, your second task:
- # see, below 42 is passed to printf.
- # that printf from the libc library.
- # it is a number constant: $42
- # but it will be printed
- # because printf is able to convert the number to string
- # and pass to write() kernel call.
+  #Call printf to print the number
+    mov %rbx, %rsi        #Move integer to RSI (printf argument)
+    mov $fmt, %rdi       #Move format string address to RDI
+    xor %rax, %rax      # Clear RAX (for variadic function)
+    call printf        # Call printf("%d\n", num)
 
- # you need to convert the character you have got from the standard input
- # to number: to integer value.
- # move that number to %rsi instead of $42 and
- # it'll be picked up by printf function
- # and written to standard output.
- mov  $42, %rsi
- mov $fmt, %rdi
- xor %rax, %rax
- call printf
+   #mov %rbx, %rsi         # Move converted number to RSI (argument for printf)
+   #mov $fmt, %rdi         # First argument: format string
+   #call printf            # Call printf
+
+   
 
 exit:
  mov $60, %rax
