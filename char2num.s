@@ -33,28 +33,26 @@ _start:
 
  # Load the character from memory
     xor %rbx, %rbx
-    movb (%rsi), %bl
-    # Check if the character is a digit (ASCII 48-57)
-    #cmp $48, %rbx          # Compare with '0'
-    #jl err0           # If less, it's not a digit
-    #cmp $57, %rbx          # Compare with '9'
-    #jg err0           # If greater, it's not a digit
+    mov (%rsi), %rbx
+    #Check if the character is a digit (ASCII 48-57)
+    cmp $48, %rbx          # Compare with '0'
+    jl err0           # If less, it's not a digit
+    cmp $57, %rbx          # Compare with '9'
+    jg err0           # If greater, it's not a digit
 
-    # If it's a digit, print "got number!"
-    #mov $1, %rbx           # syscall: write
-    #mov $1, %rdi           # file descriptor: stdout
-    #mov $number, %rsi      # address of "got number!\n"
-    #mov $13, %rdx          # length of message
-    #syscall
+     #If it's a digit, print "got number!"
+    mov $1, %rax           # syscall: write
+    mov $1, %rdi           # file descriptor: stdout
+    mov $number, %rsi      # address of "got number!\n"
+    mov $13, %rdx          # length of message
+    syscall
 
 
 
    sub $48, %rbx          # Convert character to number
-
-
   #Call printf to print the number
-    mov %rbx, %rsi        #Move integer to RSI (printf argument)
     mov $fmt, %rdi       #Move format string address to RDI
+    mov %rbx, %rsi
     xor %rax, %rax      # Clear RAX (for variadic function)
     call printf        # Call printf("%d\n", num)
 
